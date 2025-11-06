@@ -1,0 +1,26 @@
+{
+  "name": "immfi-website",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "start": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "frontend": "cd frontend/my-app && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "install-all": "npm install && cd backend && npm install && cd frontend/my-app && npm install",
+    "build": "cd frontend/my-app && npm run build",
+    "lint": "cd frontend/my-app && npm run lint",
+    "preview": "cd frontend/my-app && npm run preview"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "immfi",
+    "donations",
+    "paymongo"
+  ],
+  "author": "IMMFI",
+  "license": "MIT"
+}

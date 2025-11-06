@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/immfifavicon-logo.png" sizes="32x32" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inocencio Magtoto Memorial Foundation Inc.</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- PayMongo SDK -->
+    <script src="https://js.paymongo.com/v1/paymongo.js"></script>
+    <script>
+      // Debug PayMongo loading
+      window.addEventListener('load', function() {
+        console.log('PayMongo loaded:', window.PayMongo);
+        if (window.PayMongo) {
+          console.log('PayMongo methods:', Object.keys(window.PayMongo));
+        }
+      });
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
