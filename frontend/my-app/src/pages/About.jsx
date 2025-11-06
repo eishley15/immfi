@@ -98,14 +98,14 @@ export default function About() {
 
       {/* Mission / Vision */}
       <AnimatedSection variant="fadeUp">
-        <div className="w-full py-12 sm:py-20 bg-[url('/images/about-us-bg.png')] bg-cover bg-center bg-no-repeat flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-20 font-black px-4 sm:px-10 mb-5 relative">
-          <section className="text-center w-full max-w-[420px]">
+        <div className="w-full py-12 sm:py-20 bg-[url('/images/about-us-bg.png')] bg-cover bg-center bg-no-repeat flex flex-col lg:flex-col justify-center items-center gap-8 lg:gap-20 font-black px-4 sm:px-10 mb-5 relative">
+          <section className="text-center w-full max-w-[420px] mb-5">
             <h1 className="montserrat text-[22px] sm:text-[24px] md:text-[32px] tracking-[0.05em] text-[#004428]">Mission</h1>
             <p className="lato text-[14px] sm:text-[16px] leading-[1.5] font-normal">
-              Mainstream persons with disability in <br /> the Philippine society.
+              Driven by compassion, integrity, and inclusivity, IMMFI upholds the rights and dignity of children and youth with disabilities through the provision of programs and services on prevention, early detection, intervention, and rehabilitation, thus empowering families and communities.
             </p>
           </section>
-          <section className="text-center w-full max-w-[420px]">
+          <section className="text-center w-full max-w-[420px] mb-5">
             <h1 className="montserrat text-[22px] sm:text-[24px] md:text-[32px] tracking-[0.05em] text-[#004428]">Vision</h1>
             <p className="lato text-[14px] sm:text-[16px] leading-[1.5] font-normal">
               An inclusive society where persons with disability <br /> enjoy equal rights and opportunities.
@@ -154,24 +154,140 @@ export default function About() {
 
         {/* Second Row */}
         <motion.div
-          className="flex flex-wrap gap-6 sm:gap-8 justify-center"
+          className="flex flex-wrap gap-6 sm:gap-8 justify-center mb-20"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           transition={{ staggerChildren: 0.3 }}
         >
-          {["Lord_david","Melissa_Sanchez","Maria_Ninette","Elanor_Mangahas"].map((name, i) => (
+          {[
+            {
+              name: "Engr Arnel Sicat",
+              position: "Vice President",
+              link: "/images/board_images/Engr_Arnel_Sicat.png",
+            },
+            {
+              name: "Melissa Sanchez",
+              position: "Secretary",
+              link: "/images/board_images/Melissa_Sanchez.png",
+            },
+            {
+              name: "Maria Ninette",
+              position: "Treasurer",
+              link: "/images/board_images/Maria_Ninette.png",
+            },
+            {
+              name: "Elanor Mangahas",
+              position: "Auditor",
+              link: "/images/board_images/Elanor_Mangahas.png",
+            },
+          ].map((member, i) => (
             <AnimatedSection key={i} variant="fadeUp">
               <section className="flex flex-col items-center">
-                <img src={`/images/board_images/${name}.png`} alt={name} className="w-full max-w-[280px] h-auto" />
+                <img
+                  src={member.link}
+                  alt={member.name}
+                  className="w-full max-w-[280px] h-[320px] object-cover rounded-[12px]"
+                />
                 <div className="bg-[#004428] rounded-tr-[20px] rounded-bl-[20px] py-3 px-4 w-full max-w-[230px] text-center mt-3">
-                  <h1 className="montserrat text-[12px] sm:text-[13px] font-bold text-white">Board Member</h1>
-                  <p className="lato text-[12px] sm:text-[14px] font-medium italic text-white">{/* name label kept concise */}</p>
+                  <h1 className="montserrat text-[12px] sm:text-[13px] font-bold text-white">
+                    {member.position}
+                  </h1>
+                  <p className="lato text-[12px] sm:text-[14px] font-medium italic text-white">
+                    {member.name}
+                  </p>
                 </div>
               </section>
             </AnimatedSection>
           ))}
         </motion.div>
+
+
+        {/* Members */}
+        <AnimatedSection variant="fadeUp" className="mt-20">
+          <section className="flex flex-col justify-center items-center mb-6 sm:mb-10">
+            <h1 className="montserrat text-[22px] sm:text-[28px] md:text-[40px] font-bold text-[#004428]">Members</h1>
+          </section>
+        </AnimatedSection>
+
+        {/* Third Row */}
+        <motion.div
+          className="flex flex-wrap gap-6 sm:gap-8 justify-center mb-10"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ staggerChildren: 0.3 }}
+        >
+          {[
+            {
+              name: "Ms. Myrna C. Bituin",
+              link: "/images/board_images/myrna_bituin.png",
+            },
+            {
+              name: "Rev. Ronnie D. Cao",
+              link: "/images/board_images/ronnie_cao.png",
+            },
+            {
+              name: "Mr. Lord M. David",
+              link: "/images/board_images/Lord_david.png",
+            }
+          ].map((member, i) => (
+            <AnimatedSection key={i} variant="fadeUp">
+              <section className="flex flex-col items-center">
+                <img
+                  src={member.link}
+                  alt={member.name}
+                  className="w-full max-w-[280px] h-[320px] object-cover rounded-[12px]"
+                />
+                <div className="bg-[#004428] rounded-tr-[20px] rounded-bl-[20px] py-3 px-4 w-full max-w-[230px] text-center mt-3">
+                  <p className="lato text-[12px] sm:text-[14px] font-medium italic text-white">
+                    {member.name}
+                  </p>
+                </div>
+              </section>
+            </AnimatedSection>
+          ))}
+        </motion.div>
+
+        {/* Fourth Row */}
+        <motion.div
+          className="flex flex-wrap gap-6 sm:gap-8 justify-center mb-25"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ staggerChildren: 0.3 }}
+        >
+          {[
+            {
+              name: "Dr. Kristine A. Roa",
+              link: "/images/board_images/kristine_roa.png",
+            },
+            {
+              name: "Dr. Vincent M. Roa",
+              link: "/images/board_images/vincent_roa.png",
+            },
+            {
+              name: "Ms. Teresita M. Sanchez",
+              link: "/images/board_images/teresita_sanchez.png",
+            },
+          ].map((member, i) => (
+            <AnimatedSection key={i} variant="fadeUp">
+              <section className="flex flex-col items-center">
+                <img
+                  src={member.link}
+                  alt={member.name}
+                  className="w-full max-w-[280px] h-[320px] object-cover rounded-[12px]"
+                />
+                <div className="bg-[#004428] rounded-tr-[20px] rounded-bl-[20px] py-3 px-4 w-full max-w-[230px] text-center mt-3">
+                  <p className="lato text-[12px] sm:text-[14px] font-medium italic text-white">
+                    {member.name}
+                  </p>
+                </div>
+              </section>
+            </AnimatedSection>
+          ))}
+        </motion.div>
+
       </div>
 
       <Footer />
