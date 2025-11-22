@@ -301,7 +301,7 @@ export default function Contact() {
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleInputChange}
-                        placeholder="John Doe"
+                        placeholder="Enter your full name"
                         className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-50 transition-all duration-200 outline-none text-gray-900 placeholder-gray-400"
                         required
                       />
@@ -320,7 +320,7 @@ export default function Contact() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="john@example.com"
+                        placeholder="Enter your email address"
                         className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-50 transition-all duration-200 outline-none text-gray-900 placeholder-gray-400"
                         required
                       />

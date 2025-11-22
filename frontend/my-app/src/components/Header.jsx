@@ -32,7 +32,12 @@ export default function Header() {
               src="/images/facebook-logo.png"
               alt="Facebook Logo"
             />
-            <a href="">Inocencio Magtoto Memorial Foundation Inc.</a>
+            <a
+              href="https://www.facebook.com/profile.php?id=100083166347487"
+              target="_blank"
+            >
+              Inocencio Magtoto Memorial Foundation Inc.
+            </a>
           </div>
         </section>
       </div>
@@ -59,6 +64,7 @@ export default function Header() {
               <Link to="/contact">Contact Us</Link>
               <Link to="/gallery">Gallery</Link>
               <Link to="/services">Services</Link>
+              <Link to="/developers">Developers</Link>
             </div>
           </nav>
 
@@ -119,6 +125,13 @@ export default function Header() {
               className="py-1"
             >
               Services
+            </Link>
+            <Link
+              to="/developers"
+              onClick={() => setMenuOpen(false)}
+              className="py-1"
+            >
+              Developers
             </Link>
             <Link
               to="/donate"

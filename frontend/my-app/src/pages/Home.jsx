@@ -1,6 +1,6 @@
 import Carousel from "../components/Carousel";
 import Footer from "../components/Footer";
-import AnimatedSection from "../components/AnimatedSection"; 
+import AnimatedSection from "../components/AnimatedSection";
 
 export default function Home() {
   return (
@@ -16,7 +16,8 @@ export default function Home() {
 
         <AnimatedSection variant="fadeUp">
           <p className="lato text-center text-[13px] sm:text-[15px] md:text-[16px] max-w-[900px] leading-relaxed mt-4 sm:mt-6">
-            Inspired by a dream of equal rights and opportunities in life—especially <br />
+            Inspired by a dream of equal rights and opportunities in
+            life—especially <br />
             for the poor, deprived, and underprivileged.
           </p>
         </AnimatedSection>
@@ -37,10 +38,17 @@ export default function Home() {
         <section className="text-center flex flex-col mt-[25px] lg:flex-row justify-center items-center gap-6 lg:gap-12 mb-12 w-full max-w-[1400px]">
           <AnimatedSection variant="fadeLeft">
             <h1 className="montserrat font-medium text-black lg:text-left text-center tracking-[0.05em] mr-0 lg:mr-6 text-[18px] sm:text-[20px] md:text-[28px]">
-              <span className="text-[18px] sm:text-[20px] md:text-[28px] leading-[1.05]">Rooted in the belief</span> <br />
-              <span className="text-[16px] sm:text-[18px] md:text-[24px] leading-[1.05]">in equal opportunities</span> <br />
               <span className="text-[18px] sm:text-[20px] md:text-[28px] leading-[1.05]">
-                <span className="font-bold text-[#2E7D32]">IMMFI</span> commits to:
+                Rooted in the belief
+              </span>{" "}
+              <br />
+              <span className="text-[16px] sm:text-[18px] md:text-[24px] leading-[1.05]">
+                in equal opportunities
+              </span>{" "}
+              <br />
+              <span className="text-[18px] sm:text-[20px] md:text-[28px] leading-[1.05]">
+                <span className="font-bold text-[#2E7D32]">IMMFI</span> commits
+                to:
               </span>
             </h1>
           </AnimatedSection>
@@ -48,19 +56,34 @@ export default function Home() {
           <AnimatedSection variant="fadeRight">
             <ul className="text-left sm:text-left text-center leading-[1.6] text-[14px] sm:text-[16px] md:text-[16px] max-w-[600px]">
               <li>
-                <span className="text-[#0C9569] font-medium lg:pl-0">Strengthen</span> and broaden partnership among disability stakeholders.
+                <span className="text-[#0C9569] font-medium lg:pl-0">
+                  Strengthen
+                </span>{" "}
+                and broaden partnership among disability stakeholders.
               </li>
               <li>
-                <span className="text-[#0C9569] font-medium lg:pl-4">Advocate</span> positive attitude towards PWDs.
+                <span className="text-[#0C9569] font-medium lg:pl-4">
+                  Advocate
+                </span>{" "}
+                positive attitude towards PWDs.
               </li>
               <li>
-                <span className="text-[#0C9569] font-medium lg:pl-8">Serve</span> as a resource and training center on disability.
+                <span className="text-[#0C9569] font-medium lg:pl-8">
+                  Serve
+                </span>{" "}
+                as a resource and training center on disability.
               </li>
               <li>
-                <span className="text-[#0C9569] font-medium lg:pl-4">Support</span> existing disabled persons organizations.
+                <span className="text-[#0C9569] font-medium lg:pl-4">
+                  Support
+                </span>{" "}
+                existing disabled persons organizations.
               </li>
               <li>
-                <span className="text-[#0C9569] font-medium lg:pl-0">Empower</span> families of children with disability to form self-help groups.
+                <span className="text-[#0C9569] font-medium lg:pl-0">
+                  Empower
+                </span>{" "}
+                families of children with disability to form self-help groups.
               </li>
             </ul>
           </AnimatedSection>
@@ -72,16 +95,16 @@ export default function Home() {
               <h1 className="px-0 sm:px-4 text-[16px] sm:text-[20px] md:text-[32px] lg:text-[40px] text-center sm:text-left font-bold montserrat text-[#2E7D32] mb-6 leading-tight break-words max-w-[92vw] sm:max-w-full mx-auto">
                 Programs & Services
               </h1>
- 
-               {/* carousel wrapper: ensure no horizontal overflow on phones, center single-card slides */}
-               <div className="w-full overflow-hidden px-2 sm:px-4">
-                 <div className="w-full max-w-full mx-auto">
-                   <Carousel className="w-full max-w-full mx-auto" />
-                 </div>
-               </div>
-             </div>
-           </AnimatedSection>
-         </section>
+
+              {/* carousel wrapper: ensure no horizontal overflow on phones, center single-card slides */}
+              <div className="w-full px-2 sm:px-4">
+                <div className="w-full max-w-full mx-auto">
+                  <Carousel className="w-full max-w-full mx-auto" />
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
+        </section>
       </section>
 
       {/* About Us Section */}
@@ -105,38 +128,56 @@ export default function Home() {
 
         <AnimatedSection variant="fadeUp">
           <section className="max-w-[640px] px-2 sm:px-4">
-            <h1 className="mb-4 sm:mb-6 text-[20px] sm:text-[24px] md:text-[32px] montserrat text-[#0C9569] text-center lg:text-left">About Us</h1>
+            <h1 className="mb-4 sm:mb-6 text-[20px] sm:text-[24px] md:text-[32px] montserrat text-[#0C9569] text-center lg:text-left">
+              About Us
+            </h1>
             {/* About short intro */}
             <h1 className="mb-6 sm:mb-12 text-[16px] sm:text-[20px] md:text-[28px] font-medium w-full lg:max-w-[28rem] text-center lg:text-left">
-              We’re non-profit advocating 
-              for equal opportunities for 
-              the underprivileged and
-              NGO Organization.
+              We’re non-profit advocating for equal opportunities for the
+              underprivileged and NGO Organization.
             </h1>
 
             <ul className="space-y-4 sm:space-y-7 mb-6 sm:mb-12">
               <li className="flex items-center gap-3 lato font-medium text-[14px] sm:text-[15px]">
-                <img src="/images/check.png" className="w-auto h-[20px] sm:h-[22px]" />
+                <img
+                  src="/images/check.png"
+                  className="w-auto h-[20px] sm:h-[22px]"
+                />
                 <p>Founded in 1991 by the family of Inocencio Magtoto</p>
               </li>
               <li className="flex items-center gap-3 lato font-medium text-[14px] sm:text-[15px]">
-                <img src="/images/check.png" className="w-auto h-[20px] sm:h-[22px]" />
+                <img
+                  src="/images/check.png"
+                  className="w-auto h-[20px] sm:h-[22px]"
+                />
                 <p>Focus: Supporting children with disabilities in Pampanga</p>
               </li>
               <li className="flex items-center gap-3 lato font-medium text-[14px] sm:text-[15px]">
-                <img src="/images/check.png" className="w-auto h-[20px] sm:h-[22px]" />
+                <img
+                  src="/images/check.png"
+                  className="w-auto h-[20px] sm:h-[22px]"
+                />
                 <p>SEC-registered and licensed by DSWD since 1997</p>
               </li>
               <li className="flex items-center gap-3 lato font-medium text-[14px] sm:text-[15px]">
-                <img src="/images/check.png" className="w-auto h-[20px] sm:h-[22px]" />
-                <p>Accredited nonprofit partnered with local and national organizations</p>
+                <img
+                  src="/images/check.png"
+                  className="w-auto h-[20px] sm:h-[22px]"
+                />
+                <p>
+                  Accredited nonprofit partnered with local and national
+                  organizations
+                </p>
               </li>
             </ul>
 
             <p className="lato text-[13px] sm:text-[14px] md:text-[14px] leading-[1.6] font-light italic text-center lg:text-left">
-              Inocencio Magtoto Memorial Foundation, Inc. (IMMFI) is a non-profit <br />
-              organization based in Pampanga that advocates for children with disabilities. <br />
-              Founded in 1991, IMMFI carries forward the vision of equal rights and <br />
+              Inocencio Magtoto Memorial Foundation, Inc. (IMMFI) is a
+              non-profit <br />
+              organization based in Pampanga that advocates for children with
+              disabilities. <br />
+              Founded in 1991, IMMFI carries forward the vision of equal rights
+              and <br />
               opportunities for the poor and underprivileged.
             </p>
           </section>

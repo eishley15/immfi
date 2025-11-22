@@ -2,50 +2,68 @@
 import React, { useRef, useState, useEffect } from "react";
 import Slider from "react-slick";
 import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const cards = [
-  { img: "/images/cards/card-1.webp", title: "Education", desc: "MMFI help Children with Special Needs in their education, through subsidy of their transportation expenses." },
-  { img: "/images/cards/card-2.webp", title: "Medical & Allied Services", desc: "IMMFI offers therapy assessments and 20 sessions with LGU support, while guiding families through home programs for lasting care." },
-  { img: "/images/cards/card-3.webp", title: "Palengkiskwela", desc: "Provides street children access to education through ALS, with a mobile teacher at the “Palengkiskwela” in San Fernando’s old market." },
-  { img: "/images/cards/card-4.webp", title: "Socio & Cultural Activities", desc: "IMMFI builds social skills through fun activities and meaningful disability-focused community events." },
-  { img: "/images/cards/card-5.webp", title: "Networking & Partnership Building", desc: "IMMFI partners with donors, NGOs, volunteers, schools, LGUs, and communities, building linkages with groups that share its advocacy." },
-  { img: "/images/cards/card-6.webp", title: "Advocacy & Community Education", desc: "This activity promotes PWD rights, raises awareness, and encourages independence and inclusion in society." },
+  {
+    img: "/images/cards/card-1.webp",
+    title: "Education",
+    desc: "IMMFI help Children with Special Needs in their education, through subsidy of their transportation expenses.",
+  },
+  {
+    img: "/images/cards/card-2.webp",
+    title: "Medical & Allied Services",
+    desc: "IMMFI offers therapy assessments and 20 sessions with LGU support, while guiding families through home programs for lasting care.",
+  },
+  {
+    img: "/images/cards/card-3.webp",
+    title: "Palengkiskwela",
+    desc: 'Provides street children access to education through ALS, with a mobile teacher at the "Palengkiskwela" in San Fernando\'s old market.',
+  },
+  {
+    img: "/images/cards/card-4.webp",
+    title: "Socio & Cultural Activities",
+    desc: "IMMFI builds social skills through fun activities and meaningful disability-focused community events.",
+  },
+  {
+    img: "/images/cards/card-5.webp",
+    title: "Networking & Partnership Building",
+    desc: "IMMFI partners with donors, NGOs, volunteers, schools, LGUs, and communities, building linkages with groups that share its advocacy.",
+  },
+  {
+    img: "/images/cards/card-6.webp",
+    title: "Advocacy & Community Education",
+    desc: "This activity promotes PWD rights, raises awareness, and encourages independence and inclusion in society.",
+  },
 ];
 
 export default function Carousel() {
   const sliderRef = useRef(null);
   const wrapperRef = useRef(null);
 
-  // slidesToShow is driven by wrapper width so zooming/resize adapts correctly
   const [slidesToShow, setSlidesToShow] = useState(3);
   const [activeIndexes, setActiveIndexes] = useState([0, 1, 2]);
 
-  // compute active indexes when slidesToShow or starting index changes
   useEffect(() => {
-    // ensure activeIndexes length equals slidesToShow and starts at 0
     const initial = [];
     for (let i = 0; i < slidesToShow; i++) initial.push(i % cards.length);
     setActiveIndexes(initial);
   }, [slidesToShow]);
 
-  // Responsive behavior based on actual wrapper width (works with zoom)
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
 
     const update = (width) => {
-      // breakpoints: <640 -> 1, 640-1023 -> 2, >=1024 -> 3
       if (width < 640) setSlidesToShow(1);
       else if (width >= 640 && width < 1024) setSlidesToShow(2);
       else setSlidesToShow(3);
     };
 
-    // initial measurement
     update(el.clientWidth);
 
-    // ResizeObserver keeps it responsive to zoom and container resizing
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const w = entry.contentRect.width;
@@ -54,7 +72,6 @@ export default function Carousel() {
     });
     ro.observe(el);
 
-    // fallback for environments without ResizeObserver support
     const onResize = () => update(el.clientWidth);
     window.addEventListener("resize", onResize);
 
@@ -70,6 +87,14 @@ export default function Carousel() {
       visible.push((newIndex + i) % cards.length);
     }
     setActiveIndexes(visible);
+  };
+
+  const goToPrev = () => {
+    sliderRef.current?.slickPrev();
+  };
+
+  const goToNext = () => {
+    sliderRef.current?.slickNext();
   };
 
   const settings = {
@@ -89,7 +114,6 @@ export default function Carousel() {
     touchMove: true,
     touchThreshold: 6,
     beforeChange: handleBeforeChange,
-    // keep react-slick responsive array as a fallback (not strictly required)
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
       { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1 } },
@@ -100,17 +124,54 @@ export default function Carousel() {
     <div className="w-full h-auto flex justify-center pb-10">
       <div
         ref={wrapperRef}
-        className="w-[1100px] max-w-full"
+        className="w-[1100px] max-w-full relative"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => (e.currentTarget.style.cursor = "grabbing")}
         onMouseUp={(e) => (e.currentTarget.style.cursor = "grab")}
         onMouseLeave={(e) => (e.currentTarget.style.cursor = "grab")}
       >
+        {/* Previous Button */}
+        <button
+          onClick={goToPrev}
+          className="absolute left-0 sm:-left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10
+                     w-10 h-10 sm:w-12 sm:h-12 
+                     bg-white hover:bg-[#2E7D32] 
+                     border border-gray-200 hover:border-[#2E7D32]
+                     rounded-full shadow-lg hover:shadow-xl
+                     flex items-center justify-center
+                     transition-all duration-300 ease-out
+                     group"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft
+            size={24}
+            className="text-gray-600 group-hover:text-white transition-colors duration-300"
+          />
+        </button>
+
+        {/* Next Button */}
+        <button
+          onClick={goToNext}
+          className="absolute right-0 sm:-right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10
+                     w-10 h-10 sm:w-12 sm:h-12 
+                     bg-white hover:bg-[#2E7D32] 
+                     border border-gray-200 hover:border-[#2E7D32]
+                     rounded-full shadow-lg hover:shadow-xl
+                     flex items-center justify-center
+                     transition-all duration-300 ease-out
+                     group"
+          aria-label="Next slide"
+        >
+          <ChevronRight
+            size={24}
+            className="text-gray-600 group-hover:text-white transition-colors duration-300"
+          />
+        </button>
+
         <Slider ref={sliderRef} {...settings}>
           {cards.map((card, idx) => (
             <motion.div
               key={idx}
-              // responsive padding: smaller on phones, original on desktop (lg)
               className="px-4 py-8 sm:py-10 lg:py-15"
               initial={{ opacity: 0, y: 50 }}
               animate={
@@ -121,14 +182,12 @@ export default function Carousel() {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <div
-                // responsive heights and text sizing while keeping layout identical
                 className="w-full bg-white rounded-xl border-1 border-gray-300 flex flex-col items-center justify-start text-xl font-bold shadow-md
                            h-[380px] sm:h-[450px] lg:h-[510px]"
               >
                 <img
                   src={card.img}
                   alt={card.title}
-                  // image height scales down on smaller viewports
                   className="w-full object-cover rounded-t-lg mb-4
                              h-[180px] sm:h-[220px] lg:h-[260px]"
                 />

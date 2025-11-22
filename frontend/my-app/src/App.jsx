@@ -10,6 +10,7 @@ import Donate from "./pages/Donate";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import BlogPost from "./pages/BlogPost";
+import Developers from "./pages/Developers";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/blog/:id" element={<BlogPost />} />
+            <Route path="/developers" element={<Developers />} />
           </Routes>
         </main>
       </div>

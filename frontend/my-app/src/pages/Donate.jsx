@@ -17,6 +17,7 @@ export default function Donate() {
   const [volEmail, setVolEmail] = useState("");
   const [volPhone, setVolPhone] = useState("");
   const [volAvailability, setVolAvailability] = useState("");
+  const [volAvailabilityOther, setVolAvailabilityOther] = useState("");
   const [volSkills, setVolSkills] = useState("");
   const [volMessage, setVolMessage] = useState("");
   const [volSubmitting, setVolSubmitting] = useState(false);
@@ -93,7 +94,10 @@ export default function Donate() {
           name: volName,
           email: volEmail,
           phone: volPhone,
-          availability: volAvailability,
+          availability:
+            volAvailability === "other"
+              ? volAvailabilityOther
+              : volAvailability,
           skills: volSkills,
           message: volMessage,
         }),
@@ -115,6 +119,7 @@ export default function Donate() {
       setVolEmail("");
       setVolPhone("");
       setVolAvailability("");
+      setVolAvailabilityOther("");
       setVolSkills("");
       setVolMessage("");
     } catch (error) {
@@ -398,14 +403,33 @@ export default function Donate() {
                   <label className="block montserrat text-[14px] font-medium text-[#004428] mb-2">
                     Availability
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={volAvailability}
                     onChange={(e) => setVolAvailability(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
-                    placeholder="e.g. Weekends, Weekdays mornings"
-                  />
+                  >
+                    <option value="">Select your availability</option>
+                    <option value="weekdays">Weekdays</option>
+                    <option value="weekend">Weekend</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
+
+                {volAvailability === "other" && (
+                  <div>
+                    <label className="block montserrat text-[14px] font-medium text-[#004428] mb-2">
+                      Please specify your availability *
+                    </label>
+                    <input
+                      type="text"
+                      value={volAvailabilityOther}
+                      onChange={(e) => setVolAvailabilityOther(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2E7D32] focus:border-transparent"
+                      placeholder="e.g. Mornings only, Evenings, Flexible"
+                      required
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block montserrat text-[14px] font-medium text-[#004428] mb-2">
