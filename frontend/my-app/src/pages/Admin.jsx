@@ -9,7 +9,7 @@ import {
 } from "../components/ui/popover";
 import { Button } from "../components/ui/button";
 import { format } from "date-fns";
-import { ChevronDown, ArrowUpDown, X, LogOut } from "lucide-react";
+import { ChevronDown, ArrowUpDown, X, LogOut, Printer } from "lucide-react";
 
 // Reusable Sort Dropdown Component
 function SortDropdown({ label, options, value, onChange }) {
@@ -503,6 +503,395 @@ export default function Admin() {
     }
   };
 
+  const handlePrintVolunteers = () => {
+    const volunteers = getSortedVolunteers();
+    const printWindow = window.open("", "_blank");
+
+    const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Volunteers Report - IMMFI</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          font-family: 'Segoe UI', Arial, sans-serif; 
+          padding: 40px; 
+          color: #333;
+          line-height: 1.5;
+        }
+        .header { 
+          text-align: center; 
+          margin-bottom: 30px; 
+          padding-bottom: 20px;
+          border-bottom: 2px solid #2E7D32;
+        }
+        .header h1 { 
+          color: #2E7D32; 
+          font-size: 24px;
+          margin-bottom: 5px;
+        }
+        .header p { 
+          color: #666; 
+          font-size: 12px;
+        }
+        .summary {
+          display: flex;
+          gap: 20px;
+          margin-bottom: 25px;
+          padding: 15px;
+          background: #f9f9f9;
+          border-radius: 8px;
+        }
+        .summary-item {
+          text-align: center;
+          flex: 1;
+        }
+        .summary-item strong {
+          display: block;
+          font-size: 24px;
+          color: #2E7D32;
+        }
+        .summary-item span {
+          font-size: 11px;
+          color: #666;
+          text-transform: uppercase;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          font-size: 11px;
+          margin-top: 10px;
+        }
+        th { 
+          background: #2E7D32; 
+          color: white; 
+          padding: 10px 8px;
+          text-align: left;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 10px;
+        }
+        td { 
+          padding: 10px 8px; 
+          border-bottom: 1px solid #e0e0e0;
+          vertical-align: top;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #f0f7f0; }
+        .status {
+          display: inline-block;
+          padding: 3px 8px;
+          border-radius: 12px;
+          font-size: 10px;
+          font-weight: 600;
+        }
+        .status-approved { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .footer {
+          margin-top: 30px;
+          padding-top: 15px;
+          border-top: 1px solid #e0e0e0;
+          text-align: center;
+          font-size: 10px;
+          color: #999;
+        }
+        @media print {
+          body { padding: 20px; }
+          .summary { break-inside: avoid; }
+          tr { break-inside: avoid; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Volunteers Report</h1>
+        <p>Inocencio Magtoto Memorial Foundation Inc.</p>
+        <p>Generated on ${new Date().toLocaleDateString("en-PH", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}</p>
+      </div>
+      
+      <div class="summary">
+        <div class="summary-item">
+          <strong>${volunteers.length}</strong>
+          <span>Total Volunteers</span>
+        </div>
+        <div class="summary-item">
+          <strong>${
+            volunteers.filter((v) => v.status === "approved").length
+          }</strong>
+          <span>Approved</span>
+        </div>
+        <div class="summary-item">
+          <strong>${
+            volunteers.filter((v) => v.status === "pending").length
+          }</strong>
+          <span>Pending</span>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Availability</th>
+            <th>Skills</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${volunteers
+            .map(
+              (v) => `
+            <tr>
+              <td>${v.name}</td>
+              <td>${v.email}</td>
+              <td>${v.phone}</td>
+              <td style="text-transform: capitalize;">${v.availability}</td>
+              <td>${v.skills || "-"}</td>
+              <td>
+                <span class="status status-${v.status}">${v.status}</span>
+              </td>
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+      
+      <div class="footer">
+        <p>IMMFI Admin Dashboard • Confidential Document</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.print();
+    };
+  };
+
+  const handlePrintDonations = () => {
+    const donations = getFilteredAndSortedDonations();
+    const totalAmount = donations.reduce((acc, d) => acc + d.amount, 0);
+    const successfulDonations = donations.filter(
+      (d) => d.status === "paid" || d.status === "succeeded"
+    );
+    const printWindow = window.open("", "_blank");
+
+    const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Donations Report - IMMFI</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          font-family: 'Segoe UI', Arial, sans-serif; 
+          padding: 40px; 
+          color: #333;
+          line-height: 1.5;
+        }
+        .header { 
+          text-align: center; 
+          margin-bottom: 30px; 
+          padding-bottom: 20px;
+          border-bottom: 2px solid #2E7D32;
+        }
+        .header h1 { 
+          color: #2E7D32; 
+          font-size: 24px;
+          margin-bottom: 5px;
+        }
+        .header p { 
+          color: #666; 
+          font-size: 12px;
+        }
+        .summary {
+          display: flex;
+          gap: 20px;
+          margin-bottom: 25px;
+          padding: 15px;
+          background: #f9f9f9;
+          border-radius: 8px;
+        }
+        .summary-item {
+          text-align: center;
+          flex: 1;
+        }
+        .summary-item strong {
+          display: block;
+          font-size: 24px;
+          color: #2E7D32;
+        }
+        .summary-item span {
+          font-size: 11px;
+          color: #666;
+          text-transform: uppercase;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          font-size: 11px;
+          margin-top: 10px;
+        }
+        th { 
+          background: #2E7D32; 
+          color: white; 
+          padding: 10px 8px;
+          text-align: left;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 10px;
+        }
+        td { 
+          padding: 10px 8px; 
+          border-bottom: 1px solid #e0e0e0;
+          vertical-align: top;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #f0f7f0; }
+        .amount { 
+          font-weight: 600; 
+          color: #2E7D32;
+        }
+        .status {
+          display: inline-block;
+          padding: 3px 8px;
+          border-radius: 12px;
+          font-size: 10px;
+          font-weight: 600;
+        }
+        .status-paid, .status-succeeded { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-failed { background: #fee2e2; color: #991b1b; }
+        .footer {
+          margin-top: 30px;
+          padding-top: 15px;
+          border-top: 1px solid #e0e0e0;
+          text-align: center;
+          font-size: 10px;
+          color: #999;
+        }
+        .total-row {
+          background: #f0f7f0 !important;
+          font-weight: 600;
+        }
+        .total-row td {
+          border-top: 2px solid #2E7D32;
+        }
+        @media print {
+          body { padding: 20px; }
+          .summary { break-inside: avoid; }
+          tr { break-inside: avoid; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Donations Report</h1>
+        <p>Inocencio Magtoto Memorial Foundation Inc.</p>
+        <p>Generated on ${new Date().toLocaleDateString("en-PH", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}</p>
+      </div>
+      
+      <div class="summary">
+        <div class="summary-item">
+          <strong>${new Intl.NumberFormat("en-PH", {
+            style: "currency",
+            currency: "PHP",
+          }).format(totalAmount / 100)}</strong>
+          <span>Total Donations</span>
+        </div>
+        <div class="summary-item">
+          <strong>${successfulDonations.length}</strong>
+          <span>Successful Payments</span>
+        </div>
+        <div class="summary-item">
+          <strong>${donations.length}</strong>
+          <span>Total Transactions</span>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Donor Name</th>
+            <th>Email</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Reference</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${donations
+            .map(
+              (d) => `
+            <tr>
+              <td>${new Date(d.created_at).toLocaleDateString("en-PH", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}</td>
+              <td>${d.donor_name}</td>
+              <td>${d.donor_email}</td>
+              <td class="amount">${new Intl.NumberFormat("en-PH", {
+                style: "currency",
+                currency: "PHP",
+              }).format(d.amount / 100)}</td>
+              <td style="text-transform: capitalize;">${d.payment_method}</td>
+              <td style="font-family: monospace; font-size: 10px;">${
+                d.reference
+              }</td>
+              <td>
+                <span class="status status-${d.status}">${d.status}</span>
+              </td>
+            </tr>
+          `
+            )
+            .join("")}
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;"><strong>TOTAL:</strong></td>
+            <td class="amount">${new Intl.NumberFormat("en-PH", {
+              style: "currency",
+              currency: "PHP",
+            }).format(totalAmount / 100)}</td>
+            <td colspan="3"></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="footer">
+        <p>IMMFI Admin Dashboard • Confidential Document</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.print();
+    };
+  };
+
   if (loading) return <div className="p-8">Loading...</div>;
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
@@ -580,14 +969,30 @@ export default function Admin() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-end gap-4">
             {activeTab === "volunteers" && (
-              <div className="w-full sm:w-auto">
-                <SortDropdown
-                  label="Sort by"
-                  options={volunteerSortOptions}
-                  value={volunteerSort}
-                  onChange={setVolunteerSort}
-                />
-              </div>
+              <>
+                <div className="w-full sm:w-auto">
+                  <SortDropdown
+                    label="Sort by"
+                    options={volunteerSortOptions}
+                    value={volunteerSort}
+                    onChange={setVolunteerSort}
+                  />
+                </div>
+
+                {/* Print Button for Volunteers */}
+                <div className="w-full sm:w-auto sm:ml-auto">
+                  <label className="block text-xs font-medium text-gray-500 mb-1 invisible">
+                    Action
+                  </label>
+                  <button
+                    onClick={handlePrintVolunteers}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-green-50 hover:border-green-400 hover:text-green-700 transition-all w-full sm:w-auto"
+                  >
+                    <Printer size={16} />
+                    <span>Print Report</span>
+                  </button>
+                </div>
+              </>
             )}
 
             {activeTab === "donations" && (
@@ -634,6 +1039,19 @@ export default function Admin() {
                       />
                     </PopoverContent>
                   </Popover>
+                </div>
+                {/* Print Button for Donations */}
+                <div className="w-full sm:w-auto sm:ml-auto">
+                  <label className="block text-xs font-medium text-gray-500 mb-1 invisible">
+                    Action
+                  </label>
+                  <button
+                    onClick={handlePrintDonations}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-green-50 hover:border-green-400 hover:text-green-700 transition-all w-full sm:w-auto"
+                  >
+                    <Printer size={16} />
+                    <span>Print Report</span>
+                  </button>
                 </div>
               </>
             )}
