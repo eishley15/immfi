@@ -62,7 +62,7 @@ export default function Header() {
               <Link to="/">Home</Link>
               <Link to="/about">About Us</Link>
               <Link to="/contact">Contact Us</Link>
-              <Link to="/gallery">Gallery</Link>
+              <Link to="/activities">Activities</Link>
               <Link to="/services">Services</Link>
               <Link to="/developers">Developers</Link>
             </div>
@@ -113,11 +113,11 @@ export default function Header() {
               Contact Us
             </Link>
             <Link
-              to="/gallery"
+              to="/activities"
               onClick={() => setMenuOpen(false)}
               className="py-1"
             >
-              Gallery
+              Activities
             </Link>
             <Link
               to="/services"

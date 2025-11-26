@@ -105,8 +105,8 @@ const paymentMethodOptions = [
   { value: null, label: "All Methods" },
   { value: "card", label: "Card" },
   { value: "gcash", label: "GCash" },
-  { value: "grabpay", label: "GrabPay" },
-  { value: "maya", label: "Maya" },
+  { value: "grab_pay", label: "Grab_Pay" },
+  { value: "paymaya", label: "Paymaya" },
 ];
 
 export default function Admin() {

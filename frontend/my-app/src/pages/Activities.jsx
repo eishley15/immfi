@@ -2,14 +2,14 @@ import GalleryCarousel from "../components/GalleryCarousel";
 import Footer from "../components/Footer";
 import AnimatedSection from "../components/AnimatedSection";
 
-export default function Gallery() {
+export default function Activities() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow w-full flex flex-col items-center bg-[#F4F6F3] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="w-full max-w-7xl mx-auto">
           <AnimatedSection variant="fadeDown">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] text-left font-bold montserrat text-[#2E7D32] pb-3 sm:pb-5">
-              Discover Inspiration: IMMFI&apos;s Gallery
+              Discover Inspiration: IMMFI&apos;s Activities
             </h1>
           </AnimatedSection>
 
