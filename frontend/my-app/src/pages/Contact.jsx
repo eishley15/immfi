@@ -229,6 +229,13 @@ export default function Contact() {
                     </a>
                   </div>
                 </div>
+                <AnimatedSection variant="fadeUp">
+                  <section className="flex -mt-8">
+                     <a href="/donate" className="lato animate-bounce-low inline-block px-8 py-3 rounded-xl border-2 bg-[#004428] text-white transition-all duration-300 ease-in-out font-bold text-lg my-8 sm:my-10 z-10 relative shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        Donate Now
+                      </a>
+                  </section>
+                </AnimatedSection>
               </div>
             </AnimatedSection>
 

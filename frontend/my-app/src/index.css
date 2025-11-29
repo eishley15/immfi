@@ -139,3 +139,49 @@
   }
 }
 
+/* Smaller bounce utility: use `animate-bounce-low` to reduce bounce amplitude */
+@layer utilities {
+  @keyframes bounce-low {
+    0%, 100% {
+      transform: translateY(-10%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  .animate-bounce-low {
+    animation: bounce-low 1s infinite;
+  }
+
+  /* Pause animation when hovered and reset to resting position */
+  .animate-bounce-low:hover {
+    animation-play-state: paused;
+    transform: translateY(0) !important;
+  }
+}
+
+/* When browser zoom is ~175% or higher (heuristic), force footer into stacked, centered column.
+   We add the `zoom-175` class to <html> from JS to detect devicePixelRatio >= 1.75. */
+@layer components {
+  .zoom-175 .site-footer .footer-container {
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .zoom-175 .site-footer .footer-contact {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .zoom-175 .site-footer .footer-donate {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 0.75rem !important;
+  }
+}
+

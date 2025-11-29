@@ -22,8 +22,16 @@ export default function Home() {
           </p>
         </AnimatedSection>
 
+        <AnimatedSection variant="fadeUp">
+          <section>
+            <a href="/donate" className="lato animate-bounce-low inline-block px-8 py-3 rounded-xl border-2 bg-[#EDA30C] text-white transition-all duration-300 ease-in-out font-bold text-lg my-8 sm:my-10 z-10 relative shadow-lg hover:shadow-xl hover:-translate-y-1">
+              Donate Now
+            </a>
+          </section>
+        </AnimatedSection>
+
         <AnimatedSection variant="zoomIn">
-          <section className="-mt-12 sm:-mt-24">
+          <section className="-mt-16 sm:-mt-24 md:-mt-52">
             <img
               className="w-full lg:max-w-[1140px] md:max-w-[900px] sm:max-w-[700px] h-auto mx-auto"
               src="/images/hero-image-homepage.png"
