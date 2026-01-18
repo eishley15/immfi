@@ -74,7 +74,7 @@ export default function Header() {
               to="/donate"
               className="font-semibold text-[12px] text-white mr-1.5 bg-[#EDA30C] rounded-[20px] w-[140px] sm:w-[168px] h-[32px] sm:h-[37px] flex items-center justify-center gap-2 sm:gap-4"
             >
-              Donate Now
+              Support Now
               <img
                 src="/images/heart.png"
                 alt="Donate Icon"

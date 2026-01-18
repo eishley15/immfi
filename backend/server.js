@@ -6,7 +6,10 @@ const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const Volunteer = require('./models/Volunteer');
+const Donation = require('./models/Donation');
 const galleryRoutes = require('./routes/gallery');
+const volunteerRoutes = require('./routes/volunteers');
+const donationRoutes = require('./routes/donations');
 const { authenticateAdmin, loginAdmin } = require('./middleware/auth');
 const path = require('path');
 const fs = require('fs');
@@ -25,13 +28,30 @@ const PAYMONGO_BASE_URL = 'https://api.paymongo.com/v1';
 
 // Middleware
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost on any port for development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow configured frontend URL
+    const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3000';
+    if (origin === allowedOrigin) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('CORS not allowed'));
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve static files
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
@@ -280,58 +300,8 @@ app.get('/api/checkout-session/:sessionId', async (req, res) => {
   }
 });
 
-// Volunteer signup route
-app.post('/api/volunteer-signup', async (req, res) => {
-  try {
-    const { name, email, phone, availability, skills, message } = req.body;
-
-    // Validate required fields
-    if (!name || !email || !phone) {
-      return res.status(400).json({ 
-        error: 'Missing required fields' 
-      });
-    }
-
-    // Check if volunteer already exists
-    const existingVolunteer = await Volunteer.findOne({ email });
-    if (existingVolunteer) {
-      return res.status(400).json({ 
-        error: 'Email already registered as volunteer' 
-      });
-    }
-
-    // Create new volunteer
-    const volunteer = new Volunteer({
-      name,
-      email,
-      phone,
-      availability,
-      skills,
-      message,
-    });
-
-    // Save to database
-    await volunteer.save();
-
-    // Send success response
-    res.status(201).json({
-      message: 'Volunteer registration successful',
-      volunteer: {
-        id: volunteer._id,
-        name: volunteer.name,
-        email: volunteer.email,
-        status: volunteer.status,
-      }
-    });
-
-  } catch (error) {
-    console.error('Error in volunteer signup:', error);
-    res.status(500).json({ 
-      error: 'Failed to register volunteer',
-      details: error.message 
-    });
-  }
-});
+// Volunteer signup route - handled by volunteers router
+// POST /api/volunteers/signup is handled via /api/volunteers route
 
 // Update the admin login route
 app.post('/api/admin/login', loginAdmin);
@@ -395,43 +365,99 @@ app.post('/api/volunteers/:id/approve', authenticateAdmin, async (req, res) => {
 // Get all donations
 app.get('/api/donations', authenticateAdmin, async (req, res) => {
   try {
-    const response = await axios.get(
-      `${PAYMONGO_BASE_URL}/payments`,
-      {
-        headers: {
-          'Authorization': `Basic ${Buffer.from(PAYMONGO_SECRET_KEY + ':').toString('base64')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const payments = response.data.data;
-
-    const donations = payments.map(payment => ({
-      id: payment.id,
-      amount: payment.attributes.amount,
-      status: payment.attributes.status,
-      currency: payment.attributes.currency,
-      description: payment.attributes.description,
-      donor_name: payment.attributes.billing?.name || 
-                  payment.attributes.metadata?.donor_name || 
-                  'Anonymous',
-      donor_email: payment.attributes.billing?.email || 
-                   payment.attributes.metadata?.donor_email || 
-                   'N/A',
-      payment_method: payment.attributes.source?.type || 
-                      payment.attributes.payment_method_used || 
-                      'Unknown',
-      reference: payment.id,
-      created_at: payment.attributes.created_at * 1000, 
-    }));
-
-    res.json(donations);
+    const donations = await Donation.find({}).sort({ createdAt: -1 });
+    
+    res.json({
+      donations: donations.map(d => ({
+        id: d._id,
+        amount: d.amount,
+        donorName: d.donorName,
+        donorEmail: d.donorEmail,
+        paymentMethod: d.paymentMethod,
+        transactionRef: d.transactionRef,
+        status: d.status,
+        notes: d.notes,
+        createdAt: d.createdAt,
+        verifiedAt: d.verifiedAt
+      }))
+    });
   } catch (error) {
-    console.error('Error fetching donations:', error.response?.data || error);
+    console.error('Error fetching donations:', error);
     res.status(500).json({ 
       error: 'Failed to fetch donations',
-      details: error.response?.data?.errors || error.message
+      details: error.message
+    });
+  }
+});
+
+// Verify and approve a donation
+app.post('/api/donations/:id/verify', authenticateAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes, receiptImage } = req.body;
+
+    const donation = await Donation.findById(id);
+    
+    if (!donation) {
+      return res.status(404).json({ error: 'Donation not found' });
+    }
+
+    // Update donation status
+    donation.status = 'verified';
+    donation.verifiedAt = new Date();
+    if (notes) donation.notes = notes;
+    await donation.save();
+
+    // Send verification email to donor with receipt
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: donation.donorEmail,
+      subject: 'Your Donation Has Been Verified - IMMFI',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2E7D32;">Thank You for Your Donation!</h2>
+          <p>Dear ${donation.donorName},</p>
+          <p>We are pleased to confirm that your donation of <strong>₱${donation.amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> has been verified and received.</p>
+          <p><strong>Transaction Reference:</strong> ${donation.transactionRef}</p>
+          <p><strong>Payment Method:</strong> ${donation.paymentMethod === 'gcash' ? 'GCash' : 'Bank Transfer'}</p>
+          <p><strong>Date Verified:</strong> ${new Date(donation.verifiedAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          
+          ${receiptImage ? `
+          <div style="margin: 20px 0; text-align: center;">
+            <h3 style="color: #2E7D32;">Receipt</h3>
+            <img src="cid:receiptImage" alt="Receipt" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 5px; padding: 5px;">
+          </div>
+          ` : ''}
+          
+          <p style="margin-top: 20px; padding: 15px; background-color: #f0f9ff; border-left: 4px solid #2E7D32;">
+            Your generous support helps us continue our mission of supporting children with disabilities and their families. 
+            Every peso makes a real difference in their lives.
+          </p>
+          
+          <p>If you have any questions, please don't hesitate to contact us.</p>
+          <p style="margin-top: 20px;">With heartfelt gratitude,<br>The IMMFI Team</p>
+        </div>
+      `,
+      attachments: receiptImage ? [
+        {
+          filename: 'receipt.png',
+          content: Buffer.from(receiptImage.split(',')[1], 'base64'),
+          cid: 'receiptImage'
+        }
+      ] : []
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ 
+      message: 'Donation verified successfully and email sent to donor',
+      donation 
+    });
+  } catch (error) {
+    console.error('Error verifying donation:', error);
+    res.status(500).json({ 
+      error: 'Failed to verify donation',
+      details: error.message 
     });
   }
 });
@@ -439,25 +465,14 @@ app.get('/api/donations', authenticateAdmin, async (req, res) => {
 // Get donation statistics
 app.get('/api/donations/stats', authenticateAdmin, async (req, res) => {
   try {
-    const response = await axios.get(
-      `${PAYMONGO_BASE_URL}/payments`,
-      {
-        headers: {
-          'Authorization': `Basic ${Buffer.from(PAYMONGO_SECRET_KEY + ':').toString('base64')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const payments = response.data.data;
+    const donations = await Donation.find({});
     
     const stats = {
-      total: payments.reduce((acc, p) => acc + p.attributes.amount, 0),
-      count: payments.length,
-      successful: payments.filter(p => p.attributes.status === 'paid').length,
-      recent_total: payments
-        .filter(p => new Date(p.attributes.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-        .reduce((acc, p) => acc + p.attributes.amount, 0),
+      total: donations.filter(d => d.status === 'verified').reduce((acc, d) => acc + d.amount, 0),
+      count: donations.length,
+      verified: donations.filter(d => d.status === 'verified').length,
+      pending: donations.filter(d => d.status === 'pending').length,
+      rejected: donations.filter(d => d.status === 'rejected').length,
     };
 
     res.json(stats);
@@ -649,7 +664,7 @@ app.post('/api/send-inquiry', async (req, res) => {
     // Send email to IMMFI
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER, // This will send to IMMFI's email
+      to: process.env.EMAIL_USER, 
       subject: `New Inquiry: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -703,6 +718,9 @@ app.post('/api/send-inquiry', async (req, res) => {
 });
 
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/volunteers', volunteerRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/donation', donationRoutes); 
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

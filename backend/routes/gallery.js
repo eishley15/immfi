@@ -68,7 +68,7 @@ router.get('/posts/:id', async (req, res) => {
 // Create new blog post (admin only)
 router.post('/posts', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { title, subtitle, description, createdBy } = req.body;
+    const { title, subtitle, description, facebookUrl, createdBy } = req.body;
     
     if (!req.file) {
       return res.status(400).json({ error: 'Image is required' });
@@ -81,6 +81,7 @@ router.post('/posts', authenticateAdmin, upload.single('image'), async (req, res
       description,
       subtitle,
       imageUrl,
+      facebookUrl: facebookUrl || null,
       createdBy
     });
 
@@ -104,12 +105,12 @@ router.delete('/posts/:id', authenticateAdmin, async (req, res) => {
 // Edit blog post (admin only)
 router.put('/posts/:id', authenticateAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, subtitle, description, facebookUrl } = req.body;
     const updateData = {
       title,
       description,
       subtitle,
-      lastModified: new Date()
+      facebookUrl: facebookUrl || null
     };
 
     // If a new image is uploaded, update the image URL

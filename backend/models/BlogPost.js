@@ -17,6 +17,10 @@ const blogPostSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  facebookUrl: {
+    type: String,
+    default: null
+  },
   date: {
     type: Date,
     default: Date.now
