@@ -7,10 +7,12 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const Volunteer = require('./models/Volunteer');
 const Donation = require('./models/Donation');
+const User = require('./models/User');
+const Log = require('./models/Log');
 const galleryRoutes = require('./routes/gallery');
 const volunteerRoutes = require('./routes/volunteers');
 const donationRoutes = require('./routes/donations');
-const { authenticateAdmin, loginAdmin } = require('./middleware/auth');
+const { authenticateAdmin, loginAdmin, logoutAdmin } = require('./middleware/auth');
 const path = require('path');
 const fs = require('fs');
 
@@ -64,10 +66,7 @@ app.use('/images', (req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/immfi', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/immfi')
 .then(() => console.log('MongoDB connected successfully'))
 .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -305,6 +304,70 @@ app.get('/api/checkout-session/:sessionId', async (req, res) => {
 
 // Update the admin login route
 app.post('/api/admin/login', loginAdmin);
+
+// Logout route
+app.post('/api/admin/logout', authenticateAdmin, logoutAdmin);
+
+// Get admin logs (protected route)
+app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    const { action, limit = 100, offset = 0 } = req.query;
+    
+    const filter = action ? { action } : {};
+    const logs = await Log.find(filter)
+      .sort({ loginTime: -1 })
+      .limit(parseInt(limit))
+      .skip(parseInt(offset));
+
+    const totalCount = await Log.countDocuments(filter);
+
+    res.json({
+      logs,
+      totalCount,
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// Get logs summary/statistics (protected route)
+app.get('/api/admin/logs/summary', authenticateAdmin, async (req, res) => {
+  try {
+    const stats = await Log.aggregate([
+      {
+        $group: {
+          _id: '$username',
+          totalLogins: {
+            $sum: {
+              $cond: [{ $eq: ['$action', 'login_success'] }, 1, 0]
+            }
+          },
+          failedAttempts: {
+            $sum: {
+              $cond: [{ $eq: ['$action', 'login_failed'] }, 1, 0]
+            }
+          },
+          lastLogin: {
+            $max: {
+              $cond: [{ $eq: ['$action', 'login_success'] }, '$loginTime', null]
+            }
+          }
+        }
+      },
+      {
+        $sort: { lastLogin: -1 }
+      }
+    ]);
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching log summary:', error);
+    res.status(500).json({ error: 'Failed to fetch log summary' });
+  }
+});
 
 // Get all volunteers
 app.get('/api/volunteers', authenticateAdmin, async (req, res) => {

@@ -411,39 +411,87 @@ export default function Donate() {
                               : "Bank Transfer Details"}
                           </p>
 
-                          {/* QR Code Image */}
-                          <div className="mb-4 sm:mb-6 flex justify-center">
-                            <img
-                              src={
-                                selectedPaymentMethod === "gcash"
-                                  ? "/images/gcash-qr.jpeg"
-                                  : "/images/bank-qr.jpeg"
-                              }
-                              alt={
-                                selectedPaymentMethod === "gcash"
-                                  ? "GCash QR Code"
-                                  : "Bank Transfer QR Code"
-                              }
-                              className="w-48 sm:w-56 md:w-64 h-auto border-2 border-blue-300 rounded-lg bg-white p-2 sm:p-3 object-cover"
-                              onError={(e) => {
-                                e.target.src =
-                                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%23f0f9ff' width='200' height='200'/%3E%3Ctext x='50%25' y='45%25' font-size='14' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'%3EQR Code%3C/text%3E%3Ctext x='50%25' y='58%25' font-size='12' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'%3EPlaceholder%3C/text%3E%3C/svg%3E";
-                              }}
-                            />
-                          </div>
+                          {selectedPaymentMethod === "gcash" ? (
+                            <>
+                              {/* QR Code Image for GCash */}
+                              <div className="mb-4 sm:mb-6 flex justify-center">
+                                <img
+                                  src="/images/gcash-qr.jpeg"
+                                  alt="GCash QR Code"
+                                  className="w-48 sm:w-56 md:w-64 h-auto border-2 border-blue-300 rounded-lg bg-white p-2 sm:p-3 object-cover"
+                                  onError={(e) => {
+                                    e.target.src =
+                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%23f0f9ff' width='200' height='200'/%3E%3Ctext x='50%25' y='45%25' font-size='14' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'%3EQR Code%3C/text%3E%3Ctext x='50%25' y='58%25' font-size='12' fill='%230369a1' text-anchor='middle' dominant-baseline='middle'%3EPlaceholder%3C/text%3E%3C/svg%3E";
+                                  }}
+                                />
+                              </div>
 
-                          <div className="space-y-2 sm:space-y-3">
-                            <p className="text-xs sm:text-sm text-blue-800 font-medium">
-                              {selectedPaymentMethod === "gcash"
-                                ? "Amount: ₱" + donationAmount
-                                : "Transfer Amount: ₱" + donationAmount}
-                            </p>
-                            <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
-                              {selectedPaymentMethod === "gcash"
-                                ? "Please send the amount to our GCash account. You can scan the QR code above or manually send to 09XX XXX XXXX. You will receive a reference number upon successful transfer."
-                                : "Please transfer the amount to one of our bank accounts below:\n\nBDO: 1234567890\nMetrobank: 9876543210\n\nYou will receive a reference number from your bank after the transfer."}
-                            </p>
-                          </div>
+                              <div className="space-y-2 sm:space-y-3">
+                                <p className="text-xs sm:text-sm text-blue-800 font-medium">
+                                  Amount: ₱{donationAmount}
+                                </p>
+                                <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
+                                  Please send the amount to our GCash account.
+                                  You can scan the QR code above or manually
+                                  send to{" "}
+                                  <strong className="font-bold text-blue-900">
+                                    0921 281 6420
+                                  </strong>
+                                  . You will receive a reference number upon
+                                  successful transfer.
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {/* Bank Account Details Box */}
+                              <div className="space-y-3 sm:space-y-4">
+                                <div className="bg-white p-4 sm:p-5 rounded-lg border-2 border-blue-300">
+                                  <p className="text-xs text-blue-600 font-medium mb-2">
+                                    Bank Account Details
+                                  </p>
+                                  <p className="text-sm sm:text-base text-gray-700 mb-3">
+                                    <span className="text-gray-600">
+                                      Bank Name:
+                                    </span>{" "}
+                                    <strong className="font-bold text-[#004428] text-base sm:text-lg">
+                                      Metrobank
+                                    </strong>
+                                  </p>
+                                  <p className="text-sm sm:text-base text-gray-700 mb-1">
+                                    <span className="text-gray-600">
+                                      Account Name:
+                                    </span>
+                                  </p>
+                                  <p className="font-bold text-blue-900 text-lg sm:text-xl tracking-wide bg-blue-100 p-3 rounded border border-blue-300 text-center">
+                                    Inocencio Magtoto Memorial Foundation, Inc.
+                                  </p>
+                                  <p className="text-sm sm:text-base text-gray-700 mb-1">
+                                    <span className="text-gray-600">
+                                      Account Number:
+                                    </span>
+                                  </p>
+                                  <p className="font-bold text-blue-900 text-lg sm:text-xl tracking-wide bg-blue-100 p-3 rounded border border-blue-300 text-center">
+                                    296 3 29606389 5
+                                  </p>
+                                </div>
+
+                                <div className="bg-white p-3 sm:p-4 rounded border border-blue-200">
+                                  <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
+                                    Transfer Amount:{" "}
+                                    <strong className="font-bold text-blue-900">
+                                      ₱{donationAmount}
+                                    </strong>
+                                  </p>
+                                  <p className="text-xs sm:text-sm text-blue-800 leading-relaxed mt-2">
+                                    You will receive a reference number from
+                                    your bank after the transfer. Please save it
+                                    for your records.
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
 
