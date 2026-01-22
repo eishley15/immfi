@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
+import { apiClient, API_ENDPOINTS } from "../config/api";
 
 export default function Donate() {
   const [activeForm, setActiveForm] = useState("donation");
@@ -50,36 +51,13 @@ export default function Donate() {
     setPaymentStatus(null);
 
     try {
-      const res = await fetch("http://localhost:3001/api/donation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: parseFloat(donationAmount),
-          donorName: donorName || "Anonymous",
-          donorEmail: donorEmail,
-          paymentMethod: selectedPaymentMethod,
-          transactionRef: transactionRef,
-        }),
+      const res = await apiClient.post(API_ENDPOINTS.donation, {
+        amount: parseFloat(donationAmount),
+        donorName: donorName || "Anonymous",
+        donorEmail: donorEmail,
+        paymentMethod: selectedPaymentMethod,
+        transactionRef: transactionRef,
       });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to submit donation");
-      }
-
-      setPaymentStatus({
-        type: "success",
-        message:
-          "Thank you! Your donation has been received. We will verify the transaction shortly and send you a confirmation email.",
-      });
-
-      // Reset form
-      setDonationAmount("");
-      setDonorName("");
-      setDonorEmail("");
-      setShowPaymentMethods(false);
-      setSelectedPaymentMethod("");
-      setTransactionRef("");
     } catch (error) {
       console.error("Donation submission error:", error);
       setPaymentStatus({
@@ -105,26 +83,15 @@ export default function Donate() {
 
     try {
       // Send volunteer signup to backend (implement endpoint on backend if needed)
-      const res = await fetch("http://localhost:3001/api/volunteer-signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: volName,
-          email: volEmail,
-          phone: volPhone,
-          availability:
-            volAvailability === "other"
-              ? volAvailabilityOther
-              : volAvailability,
-          skills: volSkills,
-          message: volMessage,
-        }),
+      const res = await apiClient.post(API_ENDPOINTS.volunteerSignup, {
+        name: volName,
+        email: volEmail,
+        phone: volPhone,
+        availability:
+          volAvailability === "other" ? volAvailabilityOther : volAvailability,
+        skills: volSkills,
+        message: volMessage,
       });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to submit volunteer form");
-      }
 
       setVolStatus({
         type: "success",

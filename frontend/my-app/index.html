@@ -9,17 +9,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- PayMongo SDK -->
-    <script src="https://js.paymongo.com/v1/paymongo.js"></script>
-    <script>
-      // Debug PayMongo loading
-      window.addEventListener('load', function() {
-        console.log('PayMongo loaded:', window.PayMongo);
-        if (window.PayMongo) {
-          console.log('PayMongo methods:', Object.keys(window.PayMongo));
-        }
-      });
-    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

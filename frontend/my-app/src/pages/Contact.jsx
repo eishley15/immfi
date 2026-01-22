@@ -1,6 +1,7 @@
 import Footer from "../components/Footer";
 import AnimatedSection from "../components/AnimatedSection";
 import { useState } from "react";
+import { apiClient, API_ENDPOINTS } from "../config/api";
 
 export default function Contact() {
   // Add state for form fields
@@ -29,36 +30,29 @@ export default function Contact() {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch("http://localhost:3001/api/send-inquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      const response = await apiClient.post(
+        API_ENDPOINTS.sendInquiry,
+        formData,
+      );
+
+      setSubmitStatus({
+        type: "success",
+        message:
+          "Your inquiry has been sent successfully! We'll get back to you soon.",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubmitStatus({
-          type: "success",
-          message:
-            "Your inquiry has been sent successfully! We'll get back to you soon.",
-        });
-        // Reset form
-        setFormData({
-          fullName: "",
-          email: "",
-          subject: "",
-          message: "",
-        });
-      } else {
-        throw new Error(data.error || "Failed to send inquiry");
-      }
+      // Reset form
+      setFormData({
+        fullName: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
     } catch (error) {
       setSubmitStatus({
         type: "error",
-        message: error.message || "Failed to send inquiry. Please try again.",
+        message:
+          error.response?.data?.error ||
+          "Failed to send inquiry. Please try again.",
       });
     } finally {
       setIsSubmitting(false);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, User, AlertCircle } from "lucide-react";
+import { apiClient, API_ENDPOINTS } from "../config/api";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -15,25 +16,19 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3001/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+      const response = await apiClient.post(API_ENDPOINTS.login, {
+        username,
+        password,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("adminToken", data.token);
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("adminToken", response.data.token);
         localStorage.setItem("isAdmin", "true");
         navigate("/admin");
-      } else {
-        setError(data.error || "Invalid credentials");
       }
     } catch (err) {
-      setError("Login failed. Please try again.");
+      setError(err.response?.data?.error || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

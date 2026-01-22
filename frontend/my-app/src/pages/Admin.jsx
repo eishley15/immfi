@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_ENDPOINTS } from "../config/api";
+import { apiClient, API_ENDPOINTS } from "../config/api";
 import { LogOut } from "lucide-react";
 import VolunteersSection from "./AdminSections/VolunteersSection";
 import DonationsSection from "./AdminSections/DonationsSection";
@@ -58,20 +58,17 @@ export default function Admin() {
 
   const fetchVolunteers = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(API_ENDPOINTS.volunteers, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.status === 401) {
+      const response = await apiClient.get(API_ENDPOINTS.volunteers);
+      setVolunteers(response.data);
+      setLoading(false);
+    } catch (err) {
+      if (err.response?.status === 401) {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("isAdmin");
+        localStorage.removeItem("token");
         navigate("/admin-login");
         return;
       }
-      const data = await response.json();
-      setVolunteers(data);
-      setLoading(false);
-    } catch (err) {
       setError("Failed to fetch volunteers");
       setLoading(false);
     }
@@ -79,18 +76,10 @@ export default function Admin() {
 
   const handleApprove = async (volunteerId) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:3001/api/volunteers/${volunteerId}/approve`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await apiClient.post(
+        API_ENDPOINTS.volunteerApprove(volunteerId),
       );
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setEmailStatus("Email sent successfully!");
         fetchVolunteers();
       } else {
@@ -103,20 +92,17 @@ export default function Admin() {
 
   const fetchDonations = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch("http://localhost:3001/api/donations", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.status === 401) {
+      const response = await apiClient.get(API_ENDPOINTS.donations);
+      setDonations(response.data.donations || []);
+      setLoading(false);
+    } catch (err) {
+      if (err.response?.status === 401) {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("isAdmin");
+        localStorage.removeItem("token");
         navigate("/admin-login");
         return;
       }
-      const data = await response.json();
-      setDonations(data.donations || []);
-      setLoading(false);
-    } catch (err) {
       setError("Failed to fetch donations");
       setLoading(false);
     }
@@ -124,18 +110,10 @@ export default function Admin() {
 
   const handleSendThankYou = async (donationId) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:3001/api/donations/${donationId}/send-thank-you`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await apiClient.post(
+        API_ENDPOINTS.donationSendThankYou(donationId),
       );
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setEmailStatus("Thank you email sent successfully!");
       } else {
         throw new Error("Failed to send thank you email");
@@ -149,24 +127,16 @@ export default function Admin() {
   const handleVerifyDonation = async (donationId) => {
     try {
       setEmailStatus(null);
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:3001/api/donations/${donationId}/verify`,
+      const response = await apiClient.post(
+        API_ENDPOINTS.donationVerify(donationId),
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            notes: "Verified by admin",
-            receiptImage: receiptImage,
-          }),
-        }
+          notes: "Verified by admin",
+          receiptImage: receiptImage,
+        },
       );
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setEmailStatus(
-          "Donation verified successfully and email sent to donor!"
+          "Donation verified successfully and email sent to donor!",
         );
         setVerifyingDonationId(null);
         setReceiptImage(null);
@@ -185,16 +155,9 @@ export default function Admin() {
 
   const fetchDonationStats = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        "http://localhost:3001/api/donations/stats",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (response.ok) {
-        const stats = await response.json();
-        setDonationStats(stats);
+      const response = await apiClient.get(API_ENDPOINTS.donationStats);
+      if (response.status === 200) {
+        setDonationStats(response.data);
       }
     } catch (error) {
       console.error("Error fetching donation stats:", error);
@@ -204,21 +167,13 @@ export default function Admin() {
   const handleRejectDonation = async (donationId) => {
     try {
       setEmailStatus(null);
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:3001/api/donations/${donationId}/reject`,
+      const response = await apiClient.post(
+        `${API_ENDPOINTS.donations}/${donationId}/reject`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            notes: verificationNotes || "Rejected by admin",
-          }),
-        }
+          notes: verificationNotes || "Rejected by admin",
+        },
       );
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setEmailStatus("Donation rejected successfully!");
         setVerifyingDonationId(null);
         setReceiptImage(null);
@@ -303,7 +258,7 @@ export default function Admin() {
     // Filter by payment method
     if (paymentMethodFilter) {
       filtered = filtered.filter(
-        (d) => d.paymentMethod === paymentMethodFilter
+        (d) => d.paymentMethod === paymentMethodFilter,
       );
     }
 
@@ -380,14 +335,13 @@ export default function Admin() {
       formData.append("facebookUrl", blogPost.facebookUrl || "");
       formData.append("createdBy", "Admin");
 
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch("http://localhost:3001/api/gallery/posts", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+      const response = await apiClient.post(API_ENDPOINTS.gallery, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         setUploadStatus({
           type: "success",
           message: "Blog post created successfully!",
@@ -421,17 +375,17 @@ export default function Admin() {
         formData.append("image", blogPost.image);
       }
 
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        `http://localhost:3001/api/gallery/posts/${editingPost._id}`,
+      const response = await apiClient.put(
+        API_ENDPOINTS.blogPost(editingPost._id),
+        formData,
         {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         setUploadStatus({
           type: "success",
           message: "Blog post updated successfully!",
@@ -456,13 +410,9 @@ export default function Admin() {
 
   const fetchBlogPosts = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch("http://localhost:3001/api/gallery/posts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setBlogPosts(data);
+      const response = await apiClient.get(API_ENDPOINTS.gallery);
+      if (response.status === 200) {
+        setBlogPosts(response.data);
       }
     } catch (error) {
       console.error("Error fetching blog posts:", error);
@@ -484,7 +434,7 @@ export default function Admin() {
   const handleDeletePost = async (id) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this post? This action cannot be undone."
+        "Are you sure you want to delete this post? This action cannot be undone.",
       )
     )
       return;
@@ -685,7 +635,7 @@ export default function Admin() {
                 <span class="status status-${v.status}">${v.status}</span>
               </td>
             </tr>
-          `
+          `,
             )
             .join("")}
         </tbody>
@@ -712,7 +662,7 @@ export default function Admin() {
       (d) =>
         d.status === "verified" ||
         d.status === "paid" ||
-        d.status === "succeeded"
+        d.status === "succeeded",
     );
     const printWindow = window.open("", "_blank");
 
@@ -891,7 +841,7 @@ export default function Admin() {
                 <span class="status status-${d.status}">${d.status}</span>
               </td>
             </tr>
-          `
+          `,
             )
             .join("")}
           <tr class="total-row">
